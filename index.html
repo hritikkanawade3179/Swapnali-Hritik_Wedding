@@ -3,296 +3,370 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <title>शुभविवाह निमंत्रण</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Marathi&display=swap');
 
-/* ===== FONT ===== */
-@font-face {
-    font-family: 'Kokila';
-    src: url('fonts/Kokila.ttf') format('truetype');
-}
+    /* ===== GLOBAL SETUP ===== */
+    body {
+        font-family: 'Tiro Devanagari Marathi', serif;
+        background: url('bg.jpg') no-repeat center center/cover fixed;
+        color: white;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        background-color: #1a0000; /* Fallback deep maroon */
+    }
 
-/* ===== BODY ===== */
-body {
-    font-family: 'Kokila', serif;
-    background: url('bg.jpg') no-repeat center center/cover;
-    color: white;
-    overflow-x: hidden;   /* FIXED SCROLL */
-}
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        z-index: -1;
+    }
 
-/* DARK OVERLAY */
-body::before {
-    content: "";
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.75);
-    z-index: -1;
-}
+    /* ===== BACKGROUND & OVERLAY SPARKLES ===== */
+    #sparkle-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 20; /* High z-index so sparkles float OVER the text too */
+    }
 
-/* ===== GOLD RAIN ===== */
-.gold-rain {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 0;
-}
-.gold-rain span {
-    position: absolute;
-    width: 3px;
-    height: 12px;
-    background: linear-gradient(to bottom, gold, rgba(255,215,0,0));
-    animation: rain linear infinite;
-}
-@keyframes rain {
-    0% { transform: translateY(-100px); opacity: 0; }
-    20% { opacity: 1; }
-    100% { transform: translateY(100vh); opacity: 0; }
-}
+    /* ===== OPENING SCREEN ===== */
+    #opening {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle, #2c0000 0%, #000 100%);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
 
-/* ===== OPEN SCREEN ===== */
-#opening {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: black;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    #openBtn {
+        padding: 18px 50px;
+        background: linear-gradient(45deg, #ffd700, #f6e076, #ffae00);
+        color: #300;
+        font-weight: bold;
+        font-size: 24px;
+        border: none;
+        border-radius: 50px;
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        cursor: pointer;
+        transition: 0.4s;
+        animation: pulseButton 2s infinite;
+    }
 
-/* IMPORTANT FIX */
-body.open-active {
-    overflow: hidden;
-}
+    @keyframes pulseButton {
+        0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    }
 
-body.opened {
-    overflow-y: auto;
-}
+    /* ===== THE CINEMATIC CARD ===== */
+    #card-container {
+        display: none;
+        perspective: 1000px;
+        padding: 10px;
+    }
 
-/* BUTTON */
-#openBtn {
-    padding: 15px 30px;
-    background: gold;
-    border-radius: 10px;
-    font-size: 20px;
-}
+    #card {
+        max-width: 750px;
+        margin: 10px auto; /* Minimal upper gap */
+        padding: 40px 30px;
+        background: rgba(40, 0, 0, 0.6); /* Semi-transparent maroon */
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        border: 2px solid transparent;
+        /* Animated Gold Border */
+        background-image: linear-gradient(rgba(40,0,0,0.8), rgba(40,0,0,0.8)), 
+                          linear-gradient(135deg, #ffd700, #5e4d00, #ffd700);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,215,0,0.1);
+    }
 
-/* ===== CARD ===== */
-#card {
-    display: none;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 50px 30px;
-    border-radius: 20px;
-    border: 2px solid gold;
-    text-align: center;
-    background: rgba(0,0,0,0.65);
-    backdrop-filter: blur(10px);
-    animation: fadeIn 1.5s ease;
-    position: relative;
-    z-index: 2;
-}
+    /* Decorative Corner Flourishes */
+    .corner {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border: 3px solid gold;
+        opacity: 0.5;
+    }
+    .top-left { top: 15px; left: 15px; border-right: 0; border-bottom: 0; border-radius: 10px 0 0 0; }
+    .bottom-right { bottom: 15px; right: 15px; border-left: 0; border-top: 0; border-radius: 0 0 10px 0; }
 
-@keyframes fadeIn {
-    from {opacity:0; transform:translateY(30px);}
-    to {opacity:1; transform:translateY(0);}
-}
+    .section-title {
+        color: gold;
+        font-size: 28px;
+        margin: 30px 0 15px;
+        font-weight: bold;
+        text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        letter-spacing: 1px;
+    }
 
-/* ===== HEADINGS ===== */
-.section-title {
-    color: gold;
-    font-size: 28px;
-    margin-top: 30px;
-    margin-bottom: 15px;
-}
+    p { font-size: 21px; line-height: 1.7; margin-bottom: 25px; color: #fdfdfd; }
 
-/* ===== TEXT ===== */
-p {
-    font-size: 23px;
-    line-height: 1.8;
-}
+    .names {
+        font-size: 60px;
+        color: #ffd700;
+        margin: 35px 0;
+        font-weight: bold;
+        font-family: 'Tiro Devanagari Marathi', serif;
+        background: linear-gradient(to bottom, #fff7ad 0%, #ffa500 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+    }
 
-/* ===== NAMES ===== */
-.names {
-    font-size: 60px;
-    color: gold;
-    margin: 30px 0;
-}
+    /* ===== PHOTOS ===== */
+    .photo-wrapper {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        margin: 30px 0;
+    }
 
-/* ===== PHOTOS ===== */
-.photo-box {
-    width: 240px;
-    height: 240px;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 5px solid gold;
-    margin: 15px;
-}
+    .photo-box {
+        width: 190px;
+        height: 190px;
+        border-radius: 50%;
+        border: 4px solid gold;
+        overflow: hidden;
+        box-shadow: 0 0 25px rgba(0,0,0,0.5);
+        transition: transform 0.5s;
+    }
+    .photo-box:hover { transform: scale(1.1) rotate(3deg); }
+    .photo-box img { width: 100%; height: 100%; object-fit: cover; }
 
-.photo-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
+    /* BUTTONS */
+    .whatsapp-btn {
+        background: linear-gradient(45deg, #25D366, #128C7E);
+        color: white;
+        padding: 14px 30px;
+        border-radius: 50px;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 35px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        transition: 0.3s;
+    }
+    .whatsapp-btn:hover { color: white; transform: translateY(-3px); }
 
-/* MOBILE */
-@media(max-width:600px){
-    .names { font-size: 38px; }
-    .section-title { font-size: 22px; }
-    p { font-size: 18px; }
-    .photo-box { width:160px; height:160px; }
-}
-/* WHATSAPP BUTTON */
-.whatsapp-btn {
-    background: #25D366;
-    color: white;
-    font-size: 18px;
-    padding: 12px 25px;
-    border-radius: 10px;
-    margin-top: 20px;
-    display: inline-block;
-    text-decoration: none;
-}
-.whatsapp-btn:hover {
-    background: #1ebe5d;
-    color: white;
-}
-
+    @media(max-width: 600px) {
+        .names { font-size: 40px; }
+        .photo-box { width: 145px; height: 145px; }
+        #card { padding: 30px 15px; margin-top: 5px; }
+    }
 </style>
 </head>
+<body>
 
-<body class="open-active">
-
-<!-- GOLD RAIN -->
-<div class="gold-rain" id="rain"></div>
+<canvas id="sparkle-canvas"></canvas>
 
 <audio id="music" loop>
-<source src="shehnai.mp3">
+    <source src="shehnai.mp3">
 </audio>
 
-<!-- OPEN SCREEN -->
 <div id="opening">
-    <div class="text-center">
-        <h2 style="color:gold;">🌸 शुभविवाह निमंत्रण 🌸</h2>
+    <div class="animate__animated animate__zoomIn">
+        <h1 style="color:gold; margin-bottom: 10px; font-size: 45px;">॥ शुभविवाह ॥</h1>
+        <p style="color: #f6e076; font-size: 20px;">स्नेहपूर्ण निमंत्रण</p>
         <button id="openBtn">निमंत्रण उघडा</button>
     </div>
 </div>
 
-<!-- CARD -->
-<div id="card">
+<div id="card-container" class="container">
+    <div id="card">
+        <div class="corner top-left"></div>
+        <div class="corner bottom-right"></div>
 
-<div class="section-title">|| श्री गणेशाय नम: ||</div>
-<div class="section-title">|| श्री रेणुकामाता प्रसन्न ||</div>
+        <div class="section-title animate__animated animate__fadeInDown">|| श्री गणेशाय नम: ||</div>
+        <div class="section-title animate__animated animate__fadeInDown">|| श्री रेणुकामाता प्रसन्न ||</div>
 
-<div class="section-title">____: वर परिचय :____</div>
-<p>
-कै. कौशल्याबाई व कै. माधव राणू कानवडे तसेच<br>
-कै. सिंधूबाई व कै. जनार्दन आबाजी पा.पापळ यांचे नातू,<br>
-सौ. वैशाली व श्री. अशोक माधव पा.कानवडे यांचे ज्येष्ठ चिरंजीव<br>
-(रा. निमगाव पागा (बुद्रुक), ता. संगमनेर, जि. अहिल्यानगर)
-</p>
+        <div class="section-title">____: वर परिचय :____</div>
+        <p>
+            कै. कौशल्याबाई व कै. माधव राणू कानवडे तसेच<br>
+            कै. सिंधूबाई व कै. जनार्दन आबाजी पा.पापळ यांचे नातू,<br>
+            सौ. वैशाली व श्री. अशोक माधव पा.कानवडे यांचे ज्येष्ठ चिरंजीव<br>
+            (रा. निमगाव पागा (बुद्रुक), ता. संगमनेर, जि. अहिल्यानगर)
+        </p>
 
-<div class="d-flex justify-content-center flex-wrap">
-    <div class="photo-box"><img src="groom.jpg"></div>
-    <div class="photo-box"><img src="bride.jpg"></div>
-</div>
+        <div class="photo-wrapper">
+            <div class="photo-box"><img src="groom.jpg"></div>
+            <div class="photo-box"><img src="bride.jpg"></div>
+        </div>
 
-<div class="names">
-चि. ऋतिक <br> & <br> चि. सौ. कां. स्वप्नाली
-</div>
+        <div class="names animate__animated  animate__infinite">चि. ऋतिक <br> & <br> चि. सौ. कां. स्वप्नाली</div>
 
-<div class="section-title">____: वधू परिचय :____</div>
-<p>
-कै. लक्ष्मीबाई व कै. ठकाजी मुरलीधर पा. कुटे यांची नात,<br>
-सौ. इंदुबाई व श्री. बाबुराव ठकाजी पा. कुटे यांची कन्या<br>
-(रा. सुकेवाडी, ता. संगमनेर, जि. अहिल्यानगर)
-</p>
+        <div class="section-title">____: वधू परिचय :____</div>
+        <p>
+            कै. लक्ष्मीबाई व कै. ठकाजी मुरलीधर पा. कुटे यांची नात,<br>
+            सौ. इंदुबाई व श्री. बाबुराव ठकाजी पा. कुटे यांची कन्या<br>
+            (रा. सुकेवाडी, ता. संगमनेर, जि. अहिल्यानगर)
+        </p>
 
-<div class="section-title">____: शुभविवाह सोहळा :____</div>
-<p>
-मिती वैशाख कृ. २, शके १९४८<br>
-गुरुवार, दिनांक ०७/०५/२०२६<br>
-दुपारी १२.३६ वाजता
-</p>
+        <div class="section-title">____: शुभविवाह सोहळा :____</div>
+        <p>
+            मिती वैशाख कृ. २, शके १९४८<br>
+            <strong style="color: gold; font-size: 24px;">गुरुवार, दिनांक ०७/०५/२०२६</strong><br>
+            दुपारी १२.३६ वाजता
+        </p>
 
-<div class="section-title">____: निमंत्रण :____</div>
-<p>
-या शुभमुहूर्तावर आमचा शुभविवाह सोहळा आयोजित केला आहे.<br>
-तरी आपण सहकुटुंब सहपरिवार उपस्थित राहून वधू-वरांना<br>
-आशीर्वाद द्यावा ही नम्र विनंती.
-</p>
+        <div class="section-title">____: निमंत्रण :____</div>
+        <p>
+            या शुभमुहूर्तावर आमचा शुभविवाह सोहळा आयोजित केला आहे.<br>
+            तरी आपण सहकुटुंब सहपरिवार उपस्थित राहून वधू-वरांना<br>
+            आशीर्वाद द्यावा ही नम्र विनंती.
+        </p>
 
-<div class="section-title">____: साखरपुडा व हळदी समारंभ :____</div>
-<p>
-बुधवार दि.०६/०५/२०२६ रोजी सायंकाळी ६ वाजता विवाहस्थळी
-</p>
+        <div class="section-title">____: साखरपुडा व हळदी समारंभ :____</div>
+        <p>बुधवार दि.०६/०५/२०२६ रोजी सायंकाळी ६ वाजता विवाहस्थळी</p>
 
-<div class="section-title">____:विवाहस्थळ :____</div>
-<p>
-विघ्नहर्ता पॅलेस, नगर रोड,<br>
-समनापूर गणपती मंदिर समोर,<br>
-संगमनेर, जि. अहिल्यानगर
-</p>
+        <div class="section-title">____: विवाहस्थळ :____</div>
+        <p>
+            <strong>विघ्नहर्ता पॅलेस</strong>, नगर रोड,<br>
+            समनापूर गणपती मंदिर समोर,<br>
+            संगमनेर, जि. अहिल्यानगर
+        </p>
 
-<div class="section-title">____: आप्तेष्ट :____</div>
-<p>
-समस्त कानवडे पा. परिवार व आप्तेष्ट
-</p>
-<a class="whatsapp-btn" target="_blank"
-href="https://wa.me/?text=💐%20आपण%20आमच्या%20शुभविवाहास%20आमंत्रित%20आहात%20💐%0A%0A👉%20येथे%20निमंत्रण%20पहा:%20https://yourwebsite.com">
-📲 WhatsApp वर शेअर करा
-</a>
-<br>
+        <div class="section-title">____: आप्तेष्ट :____</div>
+        <p>समस्त कानवडे पा. परिवार व आप्तेष्ट</p>
 
-
+      <a class="whatsapp-btn" target="_blank" href="https://wa.me/?text=💐%20आपण%20आमच्या%20शुभविवाहास%20आमंत्रित%20आहात%20💐%0A%0A👉%20येथे%20निमंत्रण%20पहा:%20https://hritikkanawade3179.github.io/Swapnali-Hritik_Wedding/"> 📲 WhatsApp वर शेअर करा </a>
+    </div>
 </div>
 
 <script>
-/* OPEN BUTTON */
-document.getElementById("openBtn").onclick = function () {
-    document.getElementById("opening").style.display = "none";
-    document.getElementById("card").style.display = "block";
+    const canvas = document.getElementById('sparkle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let isUserInteracting = false;
 
-    document.body.classList.remove("open-active");
-    document.body.classList.add("opened");
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-    document.getElementById("music").play().catch(()=>{});
-
-    // Start auto scroll after opening
-    setTimeout(startAutoScroll, 1000);
-};
-
-/* AUTO SCROLL LOGIC */
-let isUserInteracted = false;
-
-function startAutoScroll() {
-    setInterval(() => {
-        if (!isUserInteracted) {
-            window.scrollBy(0, 1); // ultra smooth premium scroll
+    class Particle {
+        constructor() {
+            this.init();
         }
-    }, 20);
+        init() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 3 + 0.5;
+            this.speedX = Math.random() * 1 - 0.5;
+            this.speedY = Math.random() * 1 + 0.3;
+            this.opacity = Math.random();
+            this.color = Math.random() > 0.5 ? '#ffd700' : '#ffffff';
+        }
+        update() {
+            this.y += this.speedY;
+            this.x += this.speedX;
+            if (this.y > canvas.height) this.init(); // Reset to top
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = this.opacity;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+    }
+
+    function initParticles() {
+        for (let i = 0; i < 120; i++) particles.push(new Particle());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+
+    function startAutoScroll() {
+        let scrollSpeed = 1.5; 
+        function step() {
+            if (!isUserInteracting) {
+                window.scrollBy(0, scrollSpeed);
+                requestAnimationFrame(step);
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    document.getElementById("openBtn").onclick = function() {
+        document.getElementById("opening").style.transition = "1s";
+        document.getElementById("opening").style.opacity = "0";
+        setTimeout(() => {
+            document.getElementById("opening").style.display = "none";
+            document.getElementById("card-container").style.display = "block";
+            initParticles();
+            animate();
+            setTimeout(startAutoScroll, 1500);
+        }, 1000);
+        
+        document.getElementById("music").play().catch(() => {});
+    };
+
+    window.addEventListener("wheel", () => isUserInteracting = true);
+    window.addEventListener("touchstart", () => isUserInteracting = true);
+	
+	
+	/* NEW: Persistent Auto-Scroll Variables */
+let isAutoScrolling = false;
+let scrollTimeout;
+const scrollSpeed = 0.8; // Cinematic slow crawl
+
+/* NEW: Function to Restart Scroll after User stops touching */
+function handleUserInteraction() {
+    isAutoScrolling = false; // Stop immediately on touch/scroll
+    clearTimeout(scrollTimeout);
+    
+    // Wait for 2 seconds of NO activity, then resume
+    scrollTimeout = setTimeout(() => {
+        isAutoScrolling = true;
+    }, 2000); 
 }
 
-/* STOP WHEN USER INTERACTS */
-window.addEventListener("wheel", () => isUserInteracted = true);
-window.addEventListener("touchstart", () => isUserInteracted = true);
+/* NEW: Global Listeners for Manual Interaction */
+window.addEventListener("wheel", handleUserInteraction);
+window.addEventListener("touchstart", handleUserInteraction);
+window.addEventListener("scroll", () => {
+    if (!isAutoScrolling) {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => { isAutoScrolling = true; }, 2000);
+    }
+});
 
-/* GOLD RAIN */
-let rain = document.getElementById("rain");
-for (let i = 0; i < 80; i++) {
-    let drop = document.createElement("span");
-    drop.style.left = Math.random() * 100 + "vw";
-    drop.style.animationDuration = (2 + Math.random() * 3) + "s";
-    drop.style.animationDelay = Math.random() * 5 + "s";
-    rain.appendChild(drop);
+/* NEW: Combined Animation Loop (Sparkles + Scroll) */
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    
+    if (isAutoScrolling) {
+        window.scrollBy(0, scrollSpeed);
+    }
+    requestAnimationFrame(animate);
 }
 </script>
 
